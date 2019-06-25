@@ -94,19 +94,7 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nvar _reademe = __webpack_require__(/*! ./reademe.txt */ \"./src/reademe.txt\");\n\nvar _reademe2 = _interopRequireDefault(_reademe);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nvar msg = 'hello world';\n\ndocument.write(_reademe2.default + msg);\n\n//# sourceURL=webpack:///./src/index.js?");
-
-/***/ }),
-
-/***/ "./src/reademe.txt":
-/*!*************************!*\
-  !*** ./src/reademe.txt ***!
-  \*************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony default export */ __webpack_exports__[\"default\"] = (\"readme 文档\");\n\n//# sourceURL=webpack:///./src/reademe.txt?");
+eval("\n\n// import txt from './reademe.txt';\n\n\n// let msg='hello world';\n\n// document.write(txt+msg)\n\n\nvar parentStyle = '\\n  background: #fdc;\\n  width: 120vw;\\n  height: 60vw;\\n  box-sizing: border-box;\\n  padding: 15vw 30vw;\\n';\nvar childStyle = '\\n  background: #cdf;\\n  width: 60vw;\\n  height: 30vw;\\n';\nvar parent = document.getElementById('parent');\nvar child = document.getElementById('child');\nparent.style.cssText = parentStyle;\nchild.style.cssText = childStyle;\n\n//# sourceURL=webpack:///./src/index.js?");
 
 /***/ })
 
