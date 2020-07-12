@@ -1,128 +1,118 @@
+/*
+ * @Date: 2020-07-12 23:26:23
+ * @LastEditors: wj
+ * @Description:
+ */
 class Compile {
     constructor(el, vm) {
-        this.$vm = vm
-        this.$el = document.querySelector(el)
+        this.$el = document.querySelector(el);
+        this.$vm = vm;
         if (this.$el) {
-            this.$fragment = this.node2Fragment(this.$el)
-            this.compileElement(this.$fragment)
+            this.$fragment = this.node2fragment(this.$el);
+            this.compileElement(this.$fragment);
             this.$el.appendChild(this.$fragment)
         }
     }
-    node2Fragment (el) {
-        // 新建文档碎片 dom接口
-        let fragment = document.createDocumentFragment()
-        let child
-        // 将原生节点拷贝到fragment
-        while (child = el.firstChild) {
-            fragment.appendChild(child)
+    node2fragment (node) {
+        console.log('%c 🥔 node: ', 'font-size:20px;background-color: #E41A6A;color:#fff;', node);
+        let fragment = document.createDocumentFragment();
+        let child = null;
+        while (child = node.firstChild) {
+            fragment.appendChild(child);
         }
-        return fragment
+
+        return fragment;
+
     }
-    compileElement (el) {
-        let childNodes = el.childNodes
 
-        Array.from(childNodes).forEach((node) => {
-            let text = node.textContent
-            // 表达式文本
-            // 就是识别{{}}中的数据
-            let reg = /\{\{(.*)\}\}/
-            // 按元素节点方式编译
+    compileElement (fragment) {
+        let childNodes = fragment.childNodes;
+        console.log('%c 🍵 childNodes: ', 'font-size:20px;background-color: #ED9EC7;color:#fff;', childNodes);
+        Array.from(childNodes).forEach(node => {
+            let textReg = /\{\{(.*)\}\}/
             if (this.isElementNode(node)) {
+                console.log('%c 🌶 Elenode: ', 'font-size:20px;background-color: #F5CE50;color:#fff;', node.attributes);
                 this.compile(node)
-            } else if (this.isTextNode(node) && reg.test(text)) {
-                // 文本 并且有{{}}
-                this.compileText(node, RegExp.$1)
-
+            } else if (this.isTextNode(node) && textReg.test(node.textContent)) {
+                console.log('%c 🍐 Textnode: ', 'font-size:20px;background-color: #93C0A4;color:#fff;', node);
+                this.compileText(node, RegExp.$1);
             }
-            // 遍历编译子节点
             if (node.childNodes && node.childNodes.length) {
                 this.compileElement(node)
             }
         })
-    }
 
-    compile (node) {
-        let nodeAttrs = node.attributes
-        Array.from(nodeAttrs).forEach((attr) => {
-            // 规定：指令以 v-xxx 命名
-            // 如 <span v-text="content"></span> 中指令为 v-text
-            let attrName = attr.name	// v-text
-            let exp = attr.value // content
-            if (this.isDirective(attrName)) {
-                let dir = attrName.substring(2)	// text
-                // 普通指令
-                this[dir] && this[dir](node, this.$vm, exp)
-            }
-            if (this.isEventDirective(attrName)) {
-                let dir = attrName.substring(1)	// text
-                this.eventHandler(node, this.$vm, exp, dir)
-
-            }
-        })
     }
-    compileText (node, exp) {
-        this.text(node, this.$vm, exp)
-    }
-
-    isDirective (attr) {
-        return attr.indexOf('m-') == 0
-    }
-
-    isEventDirective (dir) {
-        return dir.indexOf('@') === 0
-    }
-
     isElementNode (node) {
-        return node.nodeType == 1
+        return node.nodeType === 1;
     }
-
     isTextNode (node) {
-        return node.nodeType == 3
+        return node.nodeType === 3;
     }
-    text (node, vm, exp) {
-        this.update(node, vm, exp, 'text')
+    isDirective (name) {
+        return name.indexOf('m-') === 0;
     }
+    isEvent (name) {
+        return name.indexOf('@') === 0;
+    }
+    compile (node) {
+        let attrs = node.attributes;
+        Array.from(attrs).forEach(attr => {
+            console.log('%c 🍑 attr: ', 'font-size:20px;background-color: #FCA650;color:#fff;', attr.name, attr.value);
+            let attrName = attr.name;
+            let key = attr.value;
+            if (this.isDirective(attrName)) {
+                console.log('%c 🥜 attrName: ', 'font-size:20px;background-color: #3F7CFF;color:#fff;', attrName);
+                let dir = attrName.substr(2);
+                console.log('%c 🍓 dir: ', 'font-size:20px;background-color: #ED9EC7;color:#fff;', dir);
+                this[dir] && this[dir](node, this.$vm, key);
+            }
+            if (this.isEvent(attrName)) {
+                let dir = attrName.substr(1);
+                // this[dir] && this[dir](key);
+                this.eventHandler(node, this.$vm, key, dir)
+            }
 
-    html (node, vm, exp) {
-        this.update(node, vm, exp, 'html')
+        })
     }
+    compileText (node, key) {
+        this.text(node, this.$vm, key)
+    }
+    eventHandler (node, vm, funName, dir) {
+        let fn = vm.$options.methods && vm.$options.methods[funName]
+        node.addEventListener(dir, fn.bind(vm), false)
+    }
+    text (node, vm, key) {
+        this.update(node, vm, key, 'text')
+    }
+    html (node, vm, key) {
+        this.update(node, vm, key, 'html')
 
-    model (node, vm, exp) {
-        this.update(node, vm, exp, 'model')
-        let val = vm.exp
-        node.addEventListener('input', (e) => {
+    }
+    model (node, vm, key) {
+        this.update(node, vm, key, 'model')
+        node.addEventListener('input', function (e) {
             let newValue = e.target.value
-            vm[exp] = newValue
-            val = newValue
+            vm[key] = newValue;
+        })
+    }
+    update (node, vm, key, type) {
+        let fun = this[`${type}Uploader`];
+        fun && fun(node, vm[key])
+
+        new Watcher(vm, key, function () {
+            fun && fun(node, vm[key])
         })
     }
 
-    update (node, vm, exp, dir) {
-        let updaterFn = this[dir + 'Updater']
-        updaterFn && updaterFn(node, vm[exp])
-        new Watcher(vm, exp, function (value) {
-            updaterFn && updaterFn(node, value)
-        })
+    textUploader (node, val) {
+        console.log('%c 🌶 val: ', 'font-size:20px;background-color: #7F2B82;color:#fff;', val);
+        node.textContent = val
     }
-
-    // 事件处理
-    eventHandler (node, vm, exp, dir) {
-        let fn = vm.$options.methods && vm.$options.methods[exp]
-        if (dir && fn) {
-            node.addEventListener(dir, fn.bind(vm), false)
-        }
+    htmlUploader (node, val) {
+        node.innerHTML = val;
     }
-    textUpdater (node, value) {
-        node.textContent = value
-    }
-
-    htmlUpdater (node, value) {
-        node.innerHTML = value
-    }
-
     modelUpdater (node, value) {
         node.value = value
     }
 }
-
-
