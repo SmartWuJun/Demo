@@ -1,0 +1,44 @@
+<!--
+ * @Date: 2021-03-23 06:13:26
+ * @LastEditors: wj
+ * @Description: 
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src='./reactivity/index.js'></script>
+</head>
+<body>
+    <div class="app">
+        <div id="btn">按钮</div>
+        <div id="content">
+            
+        </div>
+    </div>
+    
+    <script>
+        let btn=document.getElementById('btn');
+        let content=document.getElementById('content');
+        const obj={
+            name:'wj',
+            count:1
+        }
+        let obj1=reactive(obj);
+        let count2=computed(()=>obj1.count*2);
+        console.log('%c 🍟 count2: ', 'font-size:20px;background-color: #7F2B82;color:#fff;', count2);
+
+        effect(()=>{
+            console.log(112)
+            content.innerHTML='数量'+obj1.count+'double'+count2.value
+        })
+
+        btn.addEventListener('click',function(){
+            obj1.count++;
+        })
+
+    </script>
+</body>
+</html>
